@@ -1,66 +1,68 @@
 import os
-import random
-import shutil
 
-# def split_images():
-#     # Chemins des dossiers
-#     train_dir = "FDD_small/train/images"
-#     valid_dir = "FDD_small/valid/images"
-#     test_dir = "FDD_small/test/images"
+def manage_dataset_images(path):
+    # Check if the directory exists
+    if not os.path.exists(path):
+        print(f"Directory {path} does not exist.")
+        return
+    else:
+        print(f"Directory {path} exists.")
+        train_path = os.path.join(path, "train")
+        test_path = os.path.join(path, "test")
+        valid_path = os.path.join(path, "valid")
 
-#     # Création des dossiers valid et test s'ils n'existent pas
-#     os.makedirs(valid_dir, exist_ok=True)
-#     os.makedirs(test_dir, exist_ok=True)
+        os.makedirs(train_path, exist_ok=True)
+        os.makedirs(test_path, exist_ok=True)
+        os.makedirs(valid_path, exist_ok=True)
 
-#     # Liste des fichiers dans le dossier train/images
-#     images = [f for f in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, f))]
+        images_train_path = os.path.join(train_path, "images")
+        images_test_path = os.path.join(test_path, "images")
+        images_valid_path = os.path.join(valid_path, "images")
 
-#     # Sélection de 30% des images
-#     sample_size = int(len(images) * 0.3)
-#     sampled_images = random.sample(images, sample_size)
+        os.makedirs(images_train_path, exist_ok=True)
+        os.makedirs(images_test_path, exist_ok=True)
+        os.makedirs(images_valid_path, exist_ok=True)
 
-#     # Division en deux groupes : 50% pour valid et 50% pour test
-#     half_size = len(sampled_images) // 2
-#     valid_images = sampled_images[:half_size]
-#     test_images = sampled_images[half_size:]
 
-#     # Déplacement des images dans les dossiers correspondants
-#     for image in valid_images:
-#         shutil.move(os.path.join(train_dir, image), os.path.join(valid_dir, image))
+        image_files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        train_count = int(len(image_files) * 0.7)
 
-#     for image in test_images:
-#         shutil.move(os.path.join(train_dir, image), os.path.join(test_dir, image))
+        for i, image in enumerate(image_files):
+            src_path = os.path.join(path, image)
+            if i < train_count:
+                dest_path = os.path.join(images_train_path, image)
+            elif i < train_count + int(len(image_files) * 0.2):
+                dest_path = os.path.join(images_valid_path, image)
+            else:
+                dest_path = os.path.join(images_test_path, image)
+            
+            # Move the file to the appropriate directory
+            os.rename(src_path, dest_path)
+            print(f"Moved {image} to {dest_path}")
 
-#     print(f"{len(valid_images)} images déplacées vers {valid_dir}")
-#     print(f"{len(test_images)} images déplacées vers {test_dir}")
 
-# if __name__ == "__main__":
-#     split_images()
+def manage_dataset_labels(path):
+    # Check if the directory exists
+    if not os.path.exists(path):
+        print(f"Directory {path} does not exist.")
+        return
+    else:
+        print(f"Directory {path} exists.")
 
-def move_labels():
-    # Chemins des dossiers
-    valid_images_dir = "FDD_small/test/images"
-    train_labels_dir = "FDD_small/train/labels"
-    valid_labels_dir = "FDD_small/test/labels"
+        images_path = os.path.join(path, "test", "images")
+        labels_path = os.path.join(path, "test", "labels")
 
-    # Création du dossier valid/labels s'il n'existe pas
-    os.makedirs(valid_labels_dir, exist_ok=True)
+        image_files = [f for f in os.listdir(images_path) if os.path.isfile(os.path.join(images_path, f))]
 
-    # Liste des noms des images dans valid/images (sans extension)
-    image_names = [os.path.splitext(f)[0] for f in os.listdir(valid_images_dir) if os.path.isfile(os.path.join(valid_images_dir, f))]
+        for image in image_files:
+            image_name, _ = os.path.splitext(image)
+            label_file = f"{image_name}.txt"
+            src_label_path = os.path.join(path, label_file)
+            dest_label_path = os.path.join(labels_path, label_file)
+            # Move the corresponding label file if it exists
+            if os.path.exists(src_label_path):
+                os.rename(src_label_path, dest_label_path)
+                print(f"Moved {label_file} to {dest_label_path}")
 
-    # Parcours des noms et déplacement des fichiers texte correspondants
-    for name in image_names:
-        label_file = f"{name}.txt"
-        source_path = os.path.join(train_labels_dir, label_file)
-        destination_path = os.path.join(valid_labels_dir, label_file)
 
-        # Vérifie si le fichier texte existe avant de le déplacer
-        if os.path.exists(source_path):
-            shutil.move(source_path, destination_path)
-            print(f"Fichier {label_file} déplacé vers {valid_labels_dir}")
-        else:
-            print(f"Fichier {label_file} introuvable dans {train_labels_dir}")
-
-if __name__ == "__main__":
-    move_labels()
+manage_dataset_labels("D:/Enzo/RoboflowDataset/images")

@@ -1,0 +1,13 @@
+train: D:\Enzo\datasets\FabricSpotDefect\Augmented\YOLOv8\train/images
+val: D:\Enzo\datasets\FabricSpotDefect\Augmented\YOLOv8\valid/images
+test: D:\Enzo\datasets\FabricSpotDefect\Augmented\YOLOv8\test/images
+
+nc: 1
+names: ['spot']
+
+roboflow:
+  workspace: defect-dataset
+  project: fabric-defects-2
+  version: 18
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/defect-dataset/fabric-defects-2/dataset/18
